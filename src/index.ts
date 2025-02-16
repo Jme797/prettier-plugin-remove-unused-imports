@@ -4,7 +4,6 @@ const {parsers: typescriptParsers} = require('prettier/plugins/typescript');
 const parser = require('@babel/parser');
 const _traverse = require('@babel/traverse');
 const _generate = require('@babel/generator');
-const t = require('@babel/types');
 
 const generate = _generate.default;
 const traverse = _traverse.default;
@@ -32,9 +31,20 @@ function removeUnusedImports(code: string): string {
 
     traverse(ast, {
         ImportDeclaration(path: any) {
-            path.node.specifiers = path.node.specifiers.filter((specifier: any) =>
-                usedIdentifiers.has(specifier.local.name)
+            // Keep imports that don't import any specific thing
+            if (path.node.specifiers.length === 0) {
+                return;
+            }
+
+            path.node.specifiers = path.node.specifiers.filter(
+                (specifier: any) =>
+                    specifier.type === 'ImportDefaultSpecifier' || usedIdentifiers.has(specifier.local.name)
             );
+
+            // Keep the 'React' import
+            if (path.node.source.value === 'react') {
+                return;
+            }
 
             if (path.node.specifiers.length === 0) {
                 path.remove();
