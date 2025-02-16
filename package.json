@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "build": "node build.js",
-    "format": "prettier --write src/test.js"
+    "format": "prettier --write src/test.tsx"
   },
   "repository": {
     "type": "git",
