@@ -26,6 +26,11 @@ function removeUnusedImports(code: string): string {
                 usedIdentifiers.add(path.node.name);
             }
         },
+        TSTypeReference(path: any) {
+            if (path.node.typeName && path.node.typeName.name) {
+                usedIdentifiers.add(path.node.typeName.name);
+            }
+        },
     });
 
     traverse(ast, {
