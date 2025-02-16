@@ -17,7 +17,7 @@ function removeUnusedImports(code: string): string {
 
     traverse(ast, {
         Identifier(path: any) {
-            if (path.isReferencedIdentifier() && !path.findParent((p: any) => p.isTSTypeReference())) {
+            if (path.isReferencedIdentifier()) {
                 usedIdentifiers.add(path.node.name);
             }
         },

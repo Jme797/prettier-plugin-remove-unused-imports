@@ -21,6 +21,7 @@ import {
 
 import {PartnerContext} from '../../contexts/PartnerContext';
 import {SettingsContext, SettingsType} from '../../contexts/SettingsContext';
+// This is a comment of the user context
 import {UserContext} from '../../contexts/UserContext';
 import type {UserContextType} from '../../types';
 import {PartnerGroupFactory, TenantDetailFactory, UserContextFactory} from '../factories';
