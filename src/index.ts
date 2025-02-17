@@ -60,48 +60,35 @@ function removeUnusedImports(code: string): string {
     return transformedCode;
 }
 
-const preprocess = (code: string): string => {
-    // Transform the code to remove unused imports
-    const transformedCode = removeUnusedImports(code);
+const preprocess = (code: string, options: any): string => {
+    const ast = parser.parse(code, {
+        sourceType: 'module',
+        plugins: ['jsx', 'typescript'],
+        attachComment: true,
+    });
 
-    // Split the transformed code into lines
-    const transformedLines = transformedCode.split('\n');
+    let lastImportEnd = 0;
+    traverse(ast, {
+        ImportDeclaration(path: any) {
+            lastImportEnd = path.node.loc.end.line;
+        },
+    });
 
-    // Find the line where the import statements end in the original code
     const originalLines = code.split('\n');
-    let importEndLine = 0;
-    let insideImport = false;
-    let hasImports = false;
-    for (let i = 0; i < originalLines.length; i++) {
-        const line = originalLines[i].trim();
-        if (line.startsWith('import')) {
-            hasImports = true;
-        }
-        if (line.startsWith('import') || line.startsWith('//') || line.startsWith('/*') || insideImport) {
-            if (line.endsWith(';') || line.endsWith('*/')) {
-                insideImport = false;
-            } else if (line.startsWith('import') || line.startsWith('/*')) {
-                insideImport = true;
-            }
-        } else if (line !== '') {
-            importEndLine = i;
-            break;
-        }
-    }
+    const importEndLine = lastImportEnd;
 
-    // If there are no imports, just return the original code.
-    if (!hasImports) {
+    if (importEndLine === 0) {
         return code;
     }
 
-    // Extract the processed import statements
-    const processedImports = transformedLines.slice(0, importEndLine).join('\n');
+    // Transform the code to remove unused imports
+    const transformedImports = removeUnusedImports(code);
 
     // Extract the rest of the original code
     const nonImportCode = originalLines.slice(importEndLine).join('\n');
 
     // Combine processed imports with the rest of the original code
-    const finalCode = `${processedImports}\n${nonImportCode}`;
+    const finalCode = `${transformedImports}\n\n${nonImportCode}`;
 
     return finalCode;
 };
