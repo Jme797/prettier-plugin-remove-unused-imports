@@ -21,7 +21,10 @@ try {
     // Push the new branch to git
     execSync(`git push origin ${branchName}`, {stdio: 'inherit'});
 
-    console.log(`Release branch ${branchName} created and pushed successfully.`);
+    // Create a pull request and open it in the browser
+    execSync(`gh pr create --fill --base main --head ${branchName} --web`, {stdio: 'inherit'});
+
+    console.log(`Release branch ${branchName} created, pushed, and pull request opened successfully.`);
 } catch (error) {
     console.error('Error creating release branch:', error.message);
     process.exit(1);
