@@ -35,19 +35,20 @@ function removeUnusedImports(code: string): string {
 
     traverse(ast, {
         ImportDeclaration(path: any) {
-            // Keep the 'React' import
-            if (path.node.source.value === 'react') {
-                return;
-            }
-
             // Keep imports that don't import any specific thing
             if (path.node.specifiers.length === 0) {
                 return;
             }
 
-            path.node.specifiers = path.node.specifiers.filter((specifier: any) => {
-                return specifier.type === 'ImportDefaultSpecifier' || usedIdentifiers.has(specifier.local.name);
-            });
+            path.node.specifiers = path.node.specifiers.filter(
+                (specifier: any) =>
+                    specifier.type === 'ImportDefaultSpecifier' || usedIdentifiers.has(specifier.local.name)
+            );
+
+            // Keep the 'React' import
+            if (path.node.source.value === 'react') {
+                return;
+            }
 
             if (path.node.specifiers.length === 0) {
                 path.remove();
