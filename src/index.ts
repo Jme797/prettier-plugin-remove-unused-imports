@@ -45,9 +45,14 @@ function removeUnusedImports(code: string): string {
                     specifier.type === 'ImportDefaultSpecifier' || usedIdentifiers.has(specifier.local.name)
             );
 
-            // Keep the 'React' import
+            // Keep the 'React' import if it has a default import
             if (path.node.source.value === 'react') {
-                return;
+                const hasDefaultImport = path.node.specifiers.some(
+                    (specifier: any) => specifier.type === 'ImportDefaultSpecifier'
+                );
+                if (hasDefaultImport) {
+                    return;
+                }
             }
 
             if (path.node.specifiers.length === 0) {
