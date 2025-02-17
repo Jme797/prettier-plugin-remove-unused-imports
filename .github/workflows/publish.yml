@@ -43,9 +43,13 @@ jobs:
                   git config --global user.name 'github-actions[bot]'
                   git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-            - name: Fetch main branch
+            - name: Pull remote changes
               run: |
                   git remote set-url origin git@github.com:Jme797/prettier-plugin-remove-unused-imports.git
+                  git pull origin ${{ github.event.pull_request.head.ref }} --rebase
+
+            - name: Fetch main branch
+              run: |
                   git fetch origin main
 
             - name: Get version from main branch
@@ -66,10 +70,6 @@ jobs:
             - name: Increment version
               run: |
                   npm version minor -m "ci: bump version to %s"
-
-            - name: Pull remote changes
-              run: |
-                  git pull origin ${{ github.event.pull_request.head.ref }} --rebase
 
             - name: Push version bump
               run: |
