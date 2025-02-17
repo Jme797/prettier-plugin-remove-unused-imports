@@ -1,0 +1,52 @@
+# Ignore node_modules
+node_modules
+
+# Ignore build directories
+build
+
+# Ignore test files
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+__tests__
+coverage
+
+# Ignore configuration files
+*.config.js
+*.config.ts
+*.config.mjs
+*.config.cjs
+
+# Ignore local environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore editor and OS-specific files
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.log
+
+# Ignore source files
+src
+
+# Ignore Prettier configuration
+.prettierrc
+.prettierrc.js
+.prettierrc.json
+.prettierrc.yml
+.prettierrc.yaml
+.prettier.config.js
+.prettier.config.cjs
+
+# Ignore build scripts
+build.js
+
+# Ignore Yarn files
+.yarn
+.yarnrc
+.yarnrc.yml
+.pnp.*
