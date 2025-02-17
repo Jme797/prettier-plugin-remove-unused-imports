@@ -82,13 +82,15 @@ const preprocess = (code: string, options: any): string => {
     }
 
     // Transform the code to remove unused imports
-    const transformedImports = removeUnusedImports(code);
+    const transformedImports = removeUnusedImports(code).split('\n');
+
+    const processedImports = transformedImports.slice(0, importEndLine).join('\n');
 
     // Extract the rest of the original code
     const nonImportCode = originalLines.slice(importEndLine).join('\n');
 
     // Combine processed imports with the rest of the original code
-    const finalCode = `${transformedImports}\n\n${nonImportCode}`;
+    const finalCode = `${processedImports}\n\n${nonImportCode}`;
 
     return finalCode;
 };
