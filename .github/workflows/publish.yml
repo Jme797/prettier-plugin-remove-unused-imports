@@ -10,6 +10,7 @@ on:
 
 jobs:
     pr:
+        if: "!contains(github.event.head_commit.message, 'ci: bump version')"
         runs-on: ubuntu-latest
 
         steps:
@@ -47,21 +48,28 @@ jobs:
                   git remote set-url origin git@github.com:Jme797/prettier-plugin-remove-unused-imports.git
                   git fetch origin main
 
-            - name: Merge main into PR branch
+            - name: Get version from main branch
+              id: get_version
               run: |
-                  git checkout ${{ github.event.pull_request.head.ref }}
-                  git merge origin/main
+                  git checkout origin/main -- package.json
+                  echo "::set-output name=version::$(jq -r .version package.json)"
+                  git restore package.json
+
+            - name: Update version in current branch
+              run: |
+                  jq --arg version "${{ steps.get_version.outputs.version }}" '.version = $version' package.json > package.json.tmp
+                  mv package.json.tmp package.json
 
             - name: Increment version
               run: |
-                  npm version patch -m "ci: bump version to %s"
+                  npm version minor -m "ci: bump version to %s"
 
             - name: Push version bump
               run: |
                   git push origin HEAD:${{ github.event.pull_request.head.ref }}
 
     deploy:
-        if: "github.event.head_commit.message == 'ci: bump version'"
+        if: "contains(github.event.head_commit.message, 'ci: bump version')"
         runs-on: ubuntu-latest
 
         steps:
