@@ -67,11 +67,16 @@ const preprocess = (code: string): string => {
     // Split the transformed code into lines
     const transformedLines = transformedCode.split('\n');
 
-    // Find the line where the import statements end
+    // Find the line where the import statements end in the original code
+    const originalLines = code.split('\n');
     let importEndLine = 0;
     let insideImport = false;
-    for (let i = 0; i < transformedLines.length; i++) {
-        const line = transformedLines[i].trim();
+    let hasImports = false;
+    for (let i = 0; i < originalLines.length; i++) {
+        const line = originalLines[i].trim();
+        if (line.startsWith('import')) {
+            hasImports = true;
+        }
         if (line.startsWith('import') || line.startsWith('//') || line.startsWith('/*') || insideImport) {
             if (line.endsWith(';') || line.endsWith('*/')) {
                 insideImport = false;
@@ -84,11 +89,15 @@ const preprocess = (code: string): string => {
         }
     }
 
+    // If there are no imports, set importEndLine to the length of the original lines
+    if (!hasImports) {
+        importEndLine = originalLines.length;
+    }
+
     // Extract the processed import statements
     const processedImports = transformedLines.slice(0, importEndLine).join('\n');
 
     // Extract the rest of the original code
-    const originalLines = code.split('\n');
     const nonImportCode = originalLines.slice(importEndLine).join('\n');
 
     // Combine processed imports with the rest of the original code
