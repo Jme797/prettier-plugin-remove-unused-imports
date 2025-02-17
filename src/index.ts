@@ -89,9 +89,9 @@ const preprocess = (code: string): string => {
         }
     }
 
-    // If there are no imports, set importEndLine to the length of the original lines
+    // If there are no imports, just return the original code.
     if (!hasImports) {
-        importEndLine = originalLines.length;
+        return code;
     }
 
     // Extract the processed import statements
