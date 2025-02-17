@@ -8,8 +8,8 @@ try {
     // Pull the latest changes
     execSync('git pull origin main', {stdio: 'inherit'});
 
-    // Run npm version patch with a message
-    execSync(`npm version patch -m "release: bump version to %s"`, {stdio: 'inherit'});
+    // Run yarn version patch with a message
+    execSync(`yarn version --patch --message "release: bump version to %s"`, {stdio: 'inherit'});
 
     // Get the new version from package.json
     const newVersion = require('../package.json').version;
