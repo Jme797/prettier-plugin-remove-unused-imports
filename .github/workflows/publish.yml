@@ -7,6 +7,9 @@ on:
     pull_request:
         branches:
             - main
+    create:
+        tags:
+            - '*'
 
 jobs:
     pr:
@@ -31,7 +34,38 @@ jobs:
             - name: Build the project
               run: yarn build
 
+    create_tag:
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '20'
+                  registry-url: 'https://registry.npmjs.org/'
+
+            - name: Determine next version
+              id: determine_version
+              run: |
+                  git fetch --tags
+                  LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+                  echo "Latest tag: $LATEST_TAG"
+                  VERSION=$(echo $LATEST_TAG | awk -F. -v OFS=. '{$NF += 1 ; print}')
+                  echo "Next version: $VERSION"
+                  echo "::set-output name=version::$VERSION"
+
+            - name: Create a new tag
+              run: |
+                  VERSION=${{ steps.determine_version.outputs.version }}
+                  git tag -a "$VERSION" -m "Release version $VERSION"
+                  git push origin "$VERSION"
+
     deploy:
+        if: github.event_name == 'create' && startsWith(github.event.ref_type, 'tag')
         runs-on: ubuntu-latest
 
         steps:
@@ -52,6 +86,12 @@ jobs:
 
             - name: Build the project
               run: yarn build
+
+            - name: Update version in package.json
+              run: |
+                  TAG_NAME=${GITHUB_REF#refs/tags/}
+                  jq --arg version "$TAG_NAME" '.version = $version' package.json > package.json.tmp
+                  mv package.json.tmp package.json
 
             - name: Publish to npm
               run: npm publish
