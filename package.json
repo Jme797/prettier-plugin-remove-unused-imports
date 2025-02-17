@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --experimental-vm-modules $(yarn bin jest) tests",
     "build": "node build.js",
-    "format": "prettier --write src/test.tsx"
+    "format": "prettier --write src/test.tsx",
+    "release": "node scripts/create-release.js"
   },
   "repository": {
     "type": "git",
