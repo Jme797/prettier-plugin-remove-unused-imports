@@ -51,9 +51,7 @@ jobs:
             - name: Get version from main branch
               id: get_version
               run: |
-                  git checkout origin/main -- package.json
-                  echo "::set-output name=version::$(jq -r .version package.json)"
-                  git restore package.json
+                  git show origin/main:package.json | jq -r .version
 
             - name: Update version in current branch
               run: |
